@@ -34,5 +34,25 @@ jobs:
         with:
           node-version: 'lts/*'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android packages
+        shell: pwsh
+        run: |
+          if ($IsWindows) {
+            $sdkManager = Join-Path $env:ANDROID_HOME 'cmdline-tools\latest\bin\sdkmanager.bat'
+          }
+          else {
+            $sdkManager = Join-Path $env:ANDROID_HOME 'cmdline-tools/latest/bin/sdkmanager'
+          }
+          & $sdkManager 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' 'ndk;29.0.14206865'
+
+      - name: Write local.properties
+        shell: pwsh
+        run: |
+          $escaped = $env:ANDROID_HOME.Replace('\', '\\')
+          "sdk.dir=$escaped" | Set-Content -Path local.properties -Encoding ascii
+
       - name: Build
         run: ./gradlew ylcs-app:desktopApp:desktopPublish

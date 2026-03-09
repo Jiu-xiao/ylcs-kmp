@@ -31,10 +31,10 @@ abstract class CopyDesktopNativeTask : DefaultTask() {
 
         // 确定 native 库目录和 appResources 目录
         val libSourceDir = project.C.root.artifacts.desktopNative.asFile
-        val targetResourcesDir = project.packageResourcesDir.dir(project.C.resourceTag).asFile
+        val targetResourcesDir = project.packageResourcesDir.asFile
         targetResourcesDir.mkdirs()
 
-        // 复制 native 库
+        // Compose Desktop 运行时直接从 compose.application.resources.dir 根目录加载
         val libOutputList = mutableListOf<String>()
         for (moduleName in moduleList) {
             val libFile = libSourceDir.resolve(moduleName)
@@ -42,6 +42,12 @@ abstract class CopyDesktopNativeTask : DefaultTask() {
             if (libFile.exists()) {
                 libOutputList += moduleName
                 libFile.copyTo(outputFile, true)
+            }
+        }
+        if (libOutputList.isEmpty()) {
+            libSourceDir.listFiles { file -> file.isFile }?.forEach { libFile ->
+                libOutputList += libFile.name
+                libFile.copyTo(targetResourcesDir.resolve(libFile.name), true)
             }
         }
 
