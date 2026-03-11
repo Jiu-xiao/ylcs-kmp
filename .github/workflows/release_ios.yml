@@ -26,8 +26,11 @@ jobs:
       - name: Build
         run: |
           ./gradlew ylcs-app:app:portal:generateDummyFramework
+          cd ylcs-app/iosApp
+          pod install
+          cd ../..
           # xcodebuild build -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp
-          xcodebuild archive -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp
+          xcodebuild archive -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
           # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
           mkdir -p outputs/Payload
           cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
